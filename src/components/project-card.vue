@@ -23,7 +23,7 @@
     <div class="info">
       <div class="badge-container">
         <a target="_blank" rel="noopener noreferrer" v-for="badge in badges" :href="badge.link_url">
-          <img :key="badge.id" :src="badge.rendered_image_url" />
+          <img :key="badge.id" :src="badge.rendered_image_url" alt="badges image"/>
         </a>
       </div>
       <div class="spacer"></div>
@@ -113,8 +113,6 @@
           if (branchesList != null){
             let listenBranches = branchesList.split(',')
 
-            console.log(memory)
-
             listenBranches.forEach(function(element, project=this.project, status=this.status){
               if (
                 pipelines &&
@@ -128,7 +126,6 @@
                   pipelines[element][0].status === 'failed'
                 ) {
                   if(!memory.includes(pipelines[element][0].id)){
-                    console.log(pipelines[element][0].id)
                     const alarmSound = new Audio(Config.root.linkToFailureSound)
                     const soundPromise = alarmSound.play()
                     if (soundPromise !== null){
@@ -155,14 +152,15 @@
             pipelines[configuredDefaultBranch].length > 0
           ) {
 
-            // if ( // Play sound alert if default branch status changes to failed
-            //   Config.root.linkToFailureSound != null &&
-            //   this.status !== 'failed' && !!this.status &&
-            //   pipelines[configuredDefaultBranch][0].status === 'failed'
-            // ) {
-            //   const alarmSound = new Audio(Config.root.linkToFailureSound)
-            //   alarmSound.play()
-            // }
+            if ( // Play sound alert if default branch status changes to failed
+              Config.root.listenBranches === null &&
+              Config.root.linkToFailureSound != null &&
+              this.status !== 'failed' && !!this.status &&
+              pipelines[configuredDefaultBranch][0].status === 'failed'
+            ) {
+              const alarmSound = new Audio(Config.root.linkToFailureSound)
+              alarmSound.play()
+            }
 
             this.status = pipelines[configuredDefaultBranch][0].status
 
